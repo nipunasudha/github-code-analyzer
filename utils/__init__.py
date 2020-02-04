@@ -1,1 +1,2 @@
-from utils import *
+from .interactions import *
+from .utils import *
