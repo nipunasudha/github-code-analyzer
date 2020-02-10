@@ -1,5 +1,8 @@
+from analyzer import generate_report, generate_analysis_csv
 from utils import query_yes_no
-from utils.utils import get_repo_list, generate_scan_csv, clone_by_url, empty_dir
+from utils.utils import get_repo_list, clone_by_url, empty_dir
+
+CSV_PATH = './outputs/output.csv'
 
 
 def execute_command(cmd):
@@ -22,11 +25,11 @@ def execute_command(cmd):
                     clone_by_url(url)
             else:
                 print('User aborted cloning.')
-    elif cmd == 'scan':
-        csv_path = generate_scan_csv()
-        # fields = ['Problem', 'Package', 'File', 'Priority', 'Line', 'Description', 'Rule set', 'Rule']
-        # results = parse_csv_by_field(csv_path, ['Problem', 'Rule'])
-        # print(results)
+    elif cmd == 'analyze':
+        # ['Problem', 'Package', 'File', 'Priority', 'Line', 'Description', 'Rule set', 'Rule']
+        generate_analysis_csv(CSV_PATH)
+    elif cmd == 'report':
+        generate_report(CSV_PATH)
     elif cmd == 'exit':
         exit()
     elif cmd == 'help':
@@ -41,4 +44,3 @@ def execute_command(cmd):
 while True:
     command = input("Enter command to execute ('help' to learn about commands) >>")
     execute_command(command)
-# execute_command('scan')

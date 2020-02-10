@@ -57,12 +57,6 @@ def get_repo_list(username):
     return url_list
 
 
-def generate_scan_csv():
-    csv_path = './outputs/output.csv'
-    os.system(f'pmd -d ./repos/ -R rulesets/java/quickstart.xml,ruleset.xml -f csv > {csv_path}')
-    return csv_path
-
-
 def parse_csv_by_field(filename, fieldnames):
     d = defaultdict(list)
     with open(filename, newline='') as csvfile:
@@ -70,5 +64,16 @@ def parse_csv_by_field(filename, fieldnames):
         next(reader)  # remove header
         for row in reader:
             for field in fieldnames:
-                d[field].append(float(row[field]))  # thanks to Paulo!
+                d[field].append(row[field])  # thanks to Paulo!
     return dict(d)
+
+def try_numeric(s):
+    try:
+        return int(s)
+    except ValueError:
+        pass
+    try:
+        return float(s)
+    except ValueError:
+        pass
+    return s
