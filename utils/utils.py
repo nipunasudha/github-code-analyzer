@@ -1,6 +1,8 @@
+import csv
 import os
 import shutil
 import stat
+from collections import defaultdict
 from pathlib import Path
 
 import git
@@ -53,3 +55,20 @@ def get_repo_list(username):
         f"--user {username} --echo-urls").read()
     url_list = output.splitlines()
     return url_list
+
+
+def generate_scan_csv():
+    csv_path = './outputs/output.csv'
+    os.system(f'pmd -d ./repos/ -R rulesets/java/quickstart.xml,ruleset.xml -f csv > {csv_path}')
+    return csv_path
+
+
+def parse_csv_by_field(filename, fieldnames):
+    d = defaultdict(list)
+    with open(filename, newline='') as csvfile:
+        reader = csv.DictReader(csvfile, fieldnames)
+        next(reader)  # remove header
+        for row in reader:
+            for field in fieldnames:
+                d[field].append(float(row[field]))  # thanks to Paulo!
+    return dict(d)
