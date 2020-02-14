@@ -2,6 +2,7 @@ import csv
 import json
 import os
 
+from analyzer.counter import count_lines
 from utils import try_numeric
 
 
@@ -31,8 +32,15 @@ def categorize_inspections(unsorted_inspections):
     return inspections
 
 
+def get_performance(line_count):
+    return 1 - (line_count['errorLines']/line_count['codeLines'])
+
+
 def generate_report(csv_path):
     inspections = generate_dictionary(csv_path)
+    line_count = count_lines('./repos', ['.java', '.js'])
+    line_count['errorLines'] = len(inspections)
+    performance_score = get_performance(line_count)
     with open('data.json', 'w') as outfile:
         json.dump(inspections, outfile, sort_keys=True, indent=4,
                   ensure_ascii=False)
@@ -45,3 +53,8 @@ def generate_report(csv_path):
         for ruleKey, ruleVal in rulesetVal.items():
             rule_count += 1
             print(f' > {rule_count}: {ruleKey} ({len(ruleVal)} issues)')
+    print('=' * 20)
+    print(f'Total code lines: {line_count["codeLines"]}')
+    print(f'Total lines with violations: {line_count["errorLines"]}')
+    print(f'Performance Score: {"{0:.2%}".format(performance_score)}')
+    print('=' * 20)
