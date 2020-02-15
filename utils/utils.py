@@ -67,6 +67,7 @@ def parse_csv_by_field(filename, fieldnames):
                 d[field].append(row[field])  # thanks to Paulo!
     return dict(d)
 
+
 def try_numeric(s):
     try:
         return int(s)

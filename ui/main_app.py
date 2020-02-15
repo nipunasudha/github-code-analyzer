@@ -50,6 +50,7 @@ class BodyFrame(Frame):
         self.setup()
         self.list_frame = ListFrame(self)
         self.analyze_bar = AnalyzeBar(self, self.list_frame)
+        self.list_frame.append('Analyzer initialized.')
 
     def setup(self):
         self.configure(bg='yellow')

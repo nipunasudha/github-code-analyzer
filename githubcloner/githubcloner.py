@@ -1,21 +1,6 @@
-#!/usr/bin/env python3
-# coding=utf-8
-# *******************************************************************
-# *** GithubCloner ***
-# * Description:
-#   A script that clones public Github repositories
-#   of users and organizations automatically.
-# * Version:
-#   v0.3
-# * Homepage:
-#   https://github.com/mazen160/GithubCloner
-# * Author:
-#   Mazin Ahmed <Mazin AT MazinAhmed DOT net>
-# *******************************************************************
-
-# Modules
 import json
 import os
+
 try:
     import queue
 except ImportError:
@@ -59,12 +44,12 @@ class getReposURLs(object):
             resp = json.loads(resp)
 
             if self.checkResponse(resp) != 0:
-                return([])
+                return ([])
 
             for i in range(len(resp)):
                 URLs.append(resp[i]["git_pull_url"])
             current_page += 1
-        return(URLs)
+        return (URLs)
 
     def AuthenticatedGists(self, username, token):
         """
@@ -87,7 +72,7 @@ class getReposURLs(object):
                 URLs.append(resp[i]["git_pull_url"])
             current_page += 1
 
-        return(URLs)
+        return (URLs)
 
     def fromUser(self, user, username=None, token=None, include_gists=False):
         """
@@ -114,7 +99,7 @@ class getReposURLs(object):
             resp = json.loads(resp)
 
             if self.checkResponse(resp) != 0:
-                return([])
+                return ([])
 
             for i in range(len(resp)):
                 URLs.append(resp[i]["git_url"])
@@ -122,7 +107,7 @@ class getReposURLs(object):
             if include_gists is True:
                 URLs.extend(self.UserGists(user, username=username, token=token))
             current_page += 1
-        return(URLs)
+        return (URLs)
 
     def fromOrg(self, org_name, username=None, token=None):
         """
@@ -148,12 +133,12 @@ class getReposURLs(object):
             resp = json.loads(resp)
 
             if self.checkResponse(resp) != 0:
-                return([])
+                return ([])
 
             for i in range(len(resp)):
                 URLs.append(resp[i]["git_url"])
             current_page += 1
-        return(URLs)
+        return (URLs)
 
     def fromOrgIncludeUsers(self, org_name, username=None, token=None, include_gists=False):
         """
@@ -183,7 +168,7 @@ class getReposURLs(object):
             resp = json.loads(resp)
 
             if self.checkResponse(resp) != 0:
-                return([])
+                return ([])
 
             current_page += 1
             for i in range(len(resp)):
@@ -192,7 +177,7 @@ class getReposURLs(object):
         for member in members:
             URLs.extend(self.fromUser(member, username=username, token=token, include_gists=include_gists))
 
-        return(URLs)
+        return (URLs)
 
     def checkAuthentication(self, username, token):
         """
@@ -208,9 +193,9 @@ class getReposURLs(object):
         API = "{0}/user".format(self.api_prefix)
         resp = requests.get(API, auth=(username, token), timeout=self.timeout, headers=self.headers)
         if resp.status_code == 200:
-            return(True)
+            return (True)
         else:
-            return(False)
+            return (False)
 
     def checkResponse(self, response):
         """
@@ -219,17 +204,17 @@ class getReposURLs(object):
         try:
             if "API rate limit exceeded" in response["message"]:
                 print('[!] Error: Github API rate limit exceeded')
-                return(1)
+                return (1)
         except TypeError:
             pass
 
         try:
             if (response["message"] == "Not Found"):
-                return(2)  # The organization does not exist
+                return (2)  # The organization does not exist
         except TypeError:
             pass
 
-        return(0)
+        return (0)
 
     def fromAuthenticatedUser(self, username, token):
         """
@@ -253,7 +238,7 @@ class getReposURLs(object):
             for i in range(len(resp)):
                 URLs.append(resp[i]["git_url"])
             current_page += 1
-        return(URLs)
+        return (URLs)
 
 
 def parseGitURL(URL, username=None, token=None):
@@ -264,7 +249,7 @@ def parseGitURL(URL, username=None, token=None):
     URL = URL.replace("git://", "https://")
     if (username or token) is not None:
         URL = URL.replace("https://", "https://{0}:{1}@".format(username, token))
-    return(URL)
+    return (URL)
 
 
 def get_repopath(repo_username, repo_name, prefix_mode):
@@ -303,7 +288,6 @@ def cloneRepo(URL, cloningpath, username=None, token=None, prefix_mode="undersco
             print("Error: There is an error in creating directories")
 
         URL = parseGitURL(URL, username=username, token=token)
-
 
         repo_username = URL.split("/")[-2]
         repo_name = URL.split("/")[-1]
@@ -347,7 +331,8 @@ def cloneBulkRepos(URLs, cloningPath, threads_limit=5, username=None, token=None
         Q.put(URL)
     while Q.empty() is False:
         if (threading.active_count() < (threads_limit + 1)):
-            t = threading.Thread(target=cloneRepo, args=(Q.get(), cloningPath,), kwargs={"username": username, "token": token, 'prefix_mode': prefix_mode})
+            t = threading.Thread(target=cloneRepo, args=(Q.get(), cloningPath,),
+                                 kwargs={"username": username, "token": token, 'prefix_mode': prefix_mode})
             t.daemon = True
             t.start()
         else:
@@ -460,7 +445,8 @@ def main():
             print('[!] Error: Incorrect authentication value, must be: <username>:<password_or_personal_access_token>')
             print('\nExiting...')
             exit(1)
-        if getReposURLs(api_prefix).checkAuthentication(authentication.split(":")[0], authentication.split(":")[1]) is False:
+        if getReposURLs(api_prefix).checkAuthentication(authentication.split(":")[0],
+                                                        authentication.split(":")[1]) is False:
             print("Error: authentication failed.")
             print("\nExiting...")
             exit(1)
@@ -491,7 +477,8 @@ def main():
     if users is not None:
         users = users.replace(" ", "").split(",")
         for user in users:
-            URLs.extend(getReposURLs(api_prefix).fromUser(user, username=username, token=token, include_gists=include_gists))
+            URLs.extend(
+                getReposURLs(api_prefix).fromUser(user, username=username, token=token, include_gists=include_gists))
 
     if organizations is not None:
         organizations = organizations.replace(" ", "").split(",")
@@ -500,7 +487,8 @@ def main():
             if include_organization_members is False:
                 URLs.extend(getReposURLs(api_prefix).fromOrg(organization, username=username, token=token))
             else:
-                URLs.extend(getReposURLs(api_prefix).fromOrgIncludeUsers(organization, username=username, token=token, include_gists=include_gists))
+                URLs.extend(getReposURLs(api_prefix).fromOrgIncludeUsers(organization, username=username, token=token,
+                                                                         include_gists=include_gists))
 
     URLs = list(set(URLs))
     if echo_urls is True:
@@ -508,15 +496,14 @@ def main():
             print(parseGitURL(URL, username=username, token=token))
         return
 
-    cloneBulkRepos(URLs, output_path, threads_limit=threads_limit, username=username, token=token, prefix_mode=prefix_mode)
+    cloneBulkRepos(URLs, output_path, threads_limit=threads_limit, username=username, token=token,
+                   prefix_mode=prefix_mode)
 
 
 if (__name__ == "__main__"):
     try:
         main()
     except KeyboardInterrupt:
-            print('\nKeyboardInterrupt Detected.')
-            print('\nExiting...')
-            exit(0)
-
-# *** END *** #
+        print('\nKeyboardInterrupt Detected.')
+        print('\nExiting...')
+        exit(0)
