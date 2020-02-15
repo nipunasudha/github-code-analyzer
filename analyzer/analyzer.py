@@ -4,7 +4,7 @@ from utils import get_repo_list, empty_dir, clone_by_url
 
 class Analyzer(object):
     def __init__(self):
-        self.CSV_PATH = '../outputs/output.csv'
+        self.CSV_PATH = './outputs/output.csv'
 
     @staticmethod
     def clone(printer, indicator, prompter, username):
@@ -39,17 +39,23 @@ class Analyzer(object):
                 return -1
 
     def analyze(self, printer, indicator):
-        printer('Analysis started.')
+        printer('Performing static source code analysis...')
+        indicator(f'Analyzing repositories...')
         try:
             generate_analysis_csv(self.CSV_PATH)
         except Exception as e:
             printer(f'Analysis failed!\n\nError Occured: {e}')
+            indicator(f'Analysis failed.')
             return 1
 
         printer('Analysis completed. Click \'Report\' for a report.')
+        indicator(f'Analysis successful!')
         return 0
 
     def report(self, printer, indicator):
+        indicator('Generating analysis report...')
+        printer('Generating analysis report...')
         printer('============ REPORT START ============')
-        generate_report(self.CSV_PATH)
+        printer(generate_report(self.CSV_PATH))
         printer('============= REPORT END =============')
+        indicator('Report generated!')

@@ -33,10 +33,11 @@ def categorize_inspections(unsorted_inspections):
 
 
 def get_performance(line_count):
-    return 1 - (line_count['errorLines']/line_count['codeLines'])
+    return 1 - (line_count['errorLines'] / line_count['codeLines'])
 
 
 def generate_report(csv_path):
+    report = ''
     inspections = generate_dictionary(csv_path)
     line_count = count_lines('./repos', ['.java', '.js'])
     line_count['errorLines'] = len(inspections)
@@ -49,12 +50,13 @@ def generate_report(csv_path):
     for rulesetKey, rulesetVal in categorized.items():
         rule_count = 0
         ruleset_count += 1
-        print(f'{ruleset_count}: {rulesetKey}')
+        report += f'{ruleset_count}: {rulesetKey}\n'
         for ruleKey, ruleVal in rulesetVal.items():
             rule_count += 1
-            print(f' > {rule_count}: {ruleKey} ({len(ruleVal)} issues)')
-    print('=' * 20)
-    print(f'Total code lines: {line_count["codeLines"]}')
-    print(f'Total lines with violations: {line_count["errorLines"]}')
-    print(f'Performance Score: {"{0:.2%}".format(performance_score)}')
-    print('=' * 20)
+            report += f' > {rule_count}: {ruleKey} ({len(ruleVal)} issues)\n'
+    report += '=' * 20 + '\n'
+    report += f'Total code lines: {line_count["codeLines"]}\n'
+    report += f'Total lines with violations: {line_count["errorLines"]}\n'
+    report += f'Performance Score: {"{0:.2%}".format(performance_score)}\n'
+    report += '=' * 20 + '\n'
+    return report

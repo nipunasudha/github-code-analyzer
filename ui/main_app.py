@@ -89,7 +89,6 @@ class AnalyzeBar(Frame):
 
     def on_clone(self):
         username = self.username_ctrl.get()
-        self.list_frame.indicate(f'Cloning from {username}')
         process_thread = threading.Thread(target=MainApp.analyzer.clone,
                                           args=(
                                               self.list_frame.append, self.list_frame.indicate, MainApp.confirm,
@@ -97,10 +96,14 @@ class AnalyzeBar(Frame):
         process_thread.start()
 
     def on_analyze(self):
-        self.list_frame.append('Hello!\n')
+        process_thread = threading.Thread(target=MainApp.analyzer.analyze,
+                                          args=(self.list_frame.append, self.list_frame.indicate))
+        process_thread.start()
 
     def on_report(self):
-        self.list_frame.append('Hello!\n')
+        process_thread = threading.Thread(target=MainApp.analyzer.report,
+                                          args=(self.list_frame.append, self.list_frame.indicate))
+        process_thread.start()
 
 
 class ListFrame(Frame):
@@ -123,6 +126,7 @@ class ListFrame(Frame):
 
     def append(self, string):
         self.report_text.insert(END, self.LEADING + string + '\n')
+        self.report_text.see(END)
 
     def indicate(self, string):
         self.status_bar.set_text(string)
