@@ -1,60 +1,55 @@
-import csv
-import json
-import os
-
-from analyzer.counter import count_lines
-from utils import try_numeric
+from analyzer.analyzer_utils import generate_analysis_csv, generate_report
+from utils import get_repo_list, empty_dir, clone_by_url
 
 
-def generate_analysis_csv(csv_path):
-    os.system(f'pmd -d ./repos/ -R rulesets/java/quickstart.xml,ruleset.xml -f csv > {csv_path}')
+class Analyzer(object):
+    def __init__(self):
+        self.CSV_PATH = '../outputs/output.csv'
 
+    @staticmethod
+    def clone(printer, indicator, prompter, username):
+        printer(f'Fetching repositories of user \'{username}\'...')
+        indicator(f'Cloning from {username}...')
 
-def generate_dictionary(csv_path):
-    try:
-        with open(csv_path) as f:
-            a = [{k: try_numeric(v) for k, v in row.items()} for row in csv.DictReader(f, skipinitialspace=True)]
-            return a
-    except:
-        return {}
+        if username.strip() is '':
+            printer('Invalid username! Please try again.')
+            indicator(f'Cloning failed.')
+            return 1
+        else:
+            repo_list = get_repo_list(username)
+            repo_count = len(repo_list)
+            if repo_count == 0:
+                printer(f'No repositories found for user \'{username}\'! Please try again.')
+                indicator(f'Cloning failed.')
+                return 2
+            printer(f'Found {repo_count} repositories.')
+            proceed = prompter(
+                f'Do you want to clone all {repo_count} repositories found for the user \'{username}\'?')
+            empty_dir('./repos')
+            if proceed:
+                for url in repo_list:
+                    printer(f'Cloning repository \'{url}\'')
+                    clone_by_url(url)
+                printer(f'Cloned {repo_count} repositories successfully!')
+                indicator(f'Cloning successful!')
+                return 0
+            else:
+                printer('Cloning aborted by user. Previously cloned repositories might be removed!')
+                indicator(f'Cloning aborted.')
+                return -1
 
+    def analyze(self, printer, indicator):
+        printer('Analysis started.')
+        try:
+            generate_analysis_csv(self.CSV_PATH)
+        except Exception as e:
+            printer(f'Analysis failed!\n\nError Occured: {e}')
+            return 1
 
-def categorize_inspections(unsorted_inspections):
-    inspections = {}
-    for item in unsorted_inspections:
-        ruleset = item['Rule set']
-        rule = item['Rule']
-        if ruleset not in inspections:
-            inspections[ruleset] = {}
-        if rule not in inspections[ruleset]:
-            inspections[ruleset][rule] = []
-        inspections[ruleset][rule].append(item)
-    return inspections
+        printer('Analysis completed. Click \'Report\' for a report.')
+        return 0
 
-
-def get_performance(line_count):
-    return 1 - (line_count['errorLines']/line_count['codeLines'])
-
-
-def generate_report(csv_path):
-    inspections = generate_dictionary(csv_path)
-    line_count = count_lines('./repos', ['.java', '.js'])
-    line_count['errorLines'] = len(inspections)
-    performance_score = get_performance(line_count)
-    with open('data.json', 'w') as outfile:
-        json.dump(inspections, outfile, sort_keys=True, indent=4,
-                  ensure_ascii=False)
-    ruleset_count = 0
-    categorized = categorize_inspections(inspections)
-    for rulesetKey, rulesetVal in categorized.items():
-        rule_count = 0
-        ruleset_count += 1
-        print(f'{ruleset_count}: {rulesetKey}')
-        for ruleKey, ruleVal in rulesetVal.items():
-            rule_count += 1
-            print(f' > {rule_count}: {ruleKey} ({len(ruleVal)} issues)')
-    print('=' * 20)
-    print(f'Total code lines: {line_count["codeLines"]}')
-    print(f'Total lines with violations: {line_count["errorLines"]}')
-    print(f'Performance Score: {"{0:.2%}".format(performance_score)}')
-    print('=' * 20)
+    def report(self, printer, indicator):
+        printer('============ REPORT START ============')
+        generate_report(self.CSV_PATH)
+        printer('============= REPORT END =============')
