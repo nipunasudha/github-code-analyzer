@@ -76,6 +76,22 @@ class AnalyzeBar(Frame):
         self.analyze_button.grid(row=0, column=3, sticky='w', padx=4)
         self.report_button = Button(self, text='Report', bg='white', padx=10, command=self.on_report)
         self.report_button.grid(row=0, column=4, sticky='w', padx=4)
+        self.clear_button = Button(self, text='Clear', bg='red', fg='white', padx=10, command=self.on_clear)
+        self.clear_button.grid(row=0, column=5, sticky='w', padx=4)
+
+    def freeze(self):
+        self.clone_button.configure(state=DISABLED)
+        self.analyze_button.configure(state=DISABLED)
+        self.report_button.configure(state=DISABLED)
+        self.clear_button.configure(state=DISABLED)
+        self.username_entry.configure(state=DISABLED)
+
+    def unfreeze(self):
+        self.clone_button.configure(state=NORMAL)
+        self.analyze_button.configure(state=NORMAL)
+        self.report_button.configure(state=NORMAL)
+        self.clear_button.configure(state=NORMAL)
+        self.username_entry.configure(state=NORMAL)
 
     def setup(self):
         self.configure(bg='white', padx=20, pady=20)
@@ -85,7 +101,8 @@ class AnalyzeBar(Frame):
         self.grid_columnconfigure(2, weight=1)
         self.grid_columnconfigure(3, weight=1)
         self.grid_columnconfigure(4, weight=1)
-        self.grid_columnconfigure(5, weight=100)
+        self.grid_columnconfigure(5, weight=1)
+        self.grid_columnconfigure(6, weight=100)
 
     def on_clone(self):
         username = self.username_ctrl.get()
@@ -104,6 +121,9 @@ class AnalyzeBar(Frame):
         process_thread = threading.Thread(target=MainApp.analyzer.report,
                                           args=(self.list_frame.append, self.list_frame.indicate))
         process_thread.start()
+
+    def on_clear(self):
+        self.list_frame.clear()
 
 
 class ListFrame(Frame):
@@ -128,8 +148,16 @@ class ListFrame(Frame):
         self.report_text.insert(END, self.LEADING + string + '\n')
         self.report_text.see(END)
 
-    def indicate(self, string):
+    def indicate(self, string, freeze):
         self.status_bar.set_text(string)
+        if freeze:
+            self.master.analyze_bar.freeze()
+        else:
+            self.master.analyze_bar.unfreeze()
+
+    def clear(self):
+        self.status_bar.set_text('Ready')
+        self.report_text.delete('1.0', END)
 
 
 class StatusBar(Frame):
@@ -137,7 +165,7 @@ class StatusBar(Frame):
         super(StatusBar, self).__init__(master=parent)
         self.setup()
         # status text
-        self.status_label = Label(self, text="Waiting for user ", bg=self['bg'], fg='white', font=('bold', 14))
+        self.status_label = Label(self, text="Ready", bg=self['bg'], fg='white', font=('bold', 14))
         self.status_label.grid(row=0, column=0, sticky='news', pady=5)
 
     def setup(self):
