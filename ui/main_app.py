@@ -7,6 +7,7 @@ from analyzer.analyzer import Analyzer
 
 
 class MainApp(Tk):
+    # analyzer is completely isolated from UI, check the '/analyzer' module
     analyzer = Analyzer()
 
     def __init__(self):
