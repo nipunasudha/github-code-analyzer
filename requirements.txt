@@ -1,5 +1,5 @@
 requests
-gitpython
 argparse
 giturlparse
+gitpython
 PyGithub
