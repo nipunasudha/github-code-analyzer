@@ -1,21 +1,22 @@
-from analyzer.analyzer_utils import generate_analysis_csv, generate_report
+from analyzer.analyzer_utils import generate_analysis_csv, generate_report, generate_meta_json
 from utils import get_repo_list, empty_dir, clone_by_url
 
 
 class Analyzer(object):
     def __init__(self):
-        self.CSV_PATH = './outputs/output.csv'
+        self.INSPECTIONS_CSV_PATH = './outputs/inspection_output.csv'
 
-    @staticmethod
-    def clone(printer, indicator, prompter, username):
-        printer(f'Fetching repositories of user \'{username}\'...')
-        indicator(f'Cloning from {username}...', True)
-
+    def clone(self, printer, indicator, prompter, username):
         if username.strip() is '':
             printer('Invalid username! Please try again.')
             indicator(f'Cloning failed.', False)
             return 1
         else:
+            printer(f'Scanning user GitHub account \'{username}\'...')
+            indicator(f'Scanning GitHub account...', True)
+            generate_meta_json(username)
+            printer(f'Fetching repositories of user \'{username}\'...')
+            indicator(f'Cloning from {username}...', True)
             repo_list = get_repo_list(username)
             repo_count = len(repo_list)
             if repo_count == 0:
@@ -42,7 +43,7 @@ class Analyzer(object):
         printer('Performing static source code analysis...')
         indicator(f'Analyzing repositories...', True)
         try:
-            generate_analysis_csv(self.CSV_PATH)
+            generate_analysis_csv(self.INSPECTIONS_CSV_PATH)
         except Exception as e:
             printer(f'Analysis failed!\n\nError Occured: {e}')
             indicator(f'Analysis failed.', False)
@@ -56,6 +57,6 @@ class Analyzer(object):
         indicator('Generating analysis report...', True)
         printer('Generating analysis report...')
         printer('============ REPORT START ============')
-        printer(generate_report(self.CSV_PATH))
+        printer(generate_report(self.INSPECTIONS_CSV_PATH))
         printer('============= REPORT END =============')
         indicator('Report generated!', False)
