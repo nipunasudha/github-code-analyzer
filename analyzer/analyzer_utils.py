@@ -10,6 +10,9 @@ DATA_JSON_PATH = './outputs/data.json'
 META_JSON_PATH = './outputs/meta.json'
 
 
+########################################
+# all utilities required by the analyzer
+########################################
 def generate_analysis_csv(csv_path):
     os.system(f'pmd -d ./repos/ -R rulesets/java/quickstart.xml,ruleset.xml -f csv > {csv_path}')
 

@@ -1,6 +1,8 @@
 from github import Github
 
-
+########################################
+# for fetching meta information about repositories
+########################################
 class RepoInfoFetcher(object):
     def __init__(self):
         pass

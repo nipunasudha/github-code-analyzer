@@ -5,7 +5,9 @@ from tkinter.scrolledtext import ScrolledText
 
 from analyzer.analyzer import Analyzer
 
-
+########################################
+# All the code for the UI & interactions
+########################################
 class MainApp(Tk):
     # analyzer is completely isolated from UI, check the '/analyzer' module
     analyzer = Analyzer()

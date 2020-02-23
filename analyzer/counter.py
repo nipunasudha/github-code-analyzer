@@ -2,7 +2,9 @@
 import codecs
 import os.path
 
-
+########################################
+# for counting code lines
+########################################
 def count_lines(path, extensions):
     comment_symbol = "//"
     if not extensions:

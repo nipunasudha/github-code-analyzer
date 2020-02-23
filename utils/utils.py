@@ -9,6 +9,9 @@ import git
 import giturlparse
 
 
+########################################
+# all the utility functions required for the application
+########################################
 def delete_dir(dir_path):
     shutil.rmtree(dir_path, onerror=on_delete_error)
 

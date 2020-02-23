@@ -2,6 +2,9 @@ from analyzer.analyzer_utils import generate_analysis_csv, generate_report, gene
 from utils import get_repo_list, empty_dir, clone_by_url
 
 
+########################################
+# for analyzing code & generating reports
+########################################
 class Analyzer(object):
     def __init__(self):
         self.INSPECTIONS_CSV_PATH = './outputs/inspection_output.csv'

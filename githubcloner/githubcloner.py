@@ -12,6 +12,9 @@ import argparse
 import git
 import requests
 
+########################################
+# for cloning repositories of a user
+########################################
 
 class getReposURLs(object):
     def __init__(self, api_prefix):
