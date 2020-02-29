@@ -4,10 +4,7 @@ import os
 
 from analyzer.counter import count_lines
 from analyzer.repo_info import RepoInfoFetcher
-from utils import try_numeric
-
-DATA_JSON_PATH = './outputs/data.json'
-META_JSON_PATH = './outputs/meta.json'
+from utils import try_numeric, utils
 
 
 ########################################
@@ -28,9 +25,23 @@ def generate_dictionary(csv_path):
 
 def generate_meta_json(username):
     repo_meta = RepoInfoFetcher.get_repo_info(username)
-    with open(META_JSON_PATH, 'w') as outfile:
+    with open(f'./outputs/{username}/meta.json', 'w') as outfile:
         json.dump(repo_meta, outfile, sort_keys=True, indent=4,
                   ensure_ascii=False)
+
+
+def save_current_user(username):
+    utils.create_folder_if_not_exist(f'./outputs/{username}')
+    data = {'username': username}
+    with open(f'./settings/current_username.json', 'w') as outfile:
+        json.dump(data, outfile, sort_keys=True, indent=4,
+                  ensure_ascii=False)
+
+
+def get_current_user():
+    raw = open(f'./settings/current_username.json').read()
+    username = json.loads(raw)['username']
+    return username
 
 
 def categorize_inspections(unsorted_inspections):
@@ -52,7 +63,7 @@ def get_performance(line_count):
 
 def get_formatted_meta():
     import json
-    meta_raw = open(META_JSON_PATH).read()
+    meta_raw = open(f'./outputs/{get_current_user()}/meta.json').read()
     meta = json.loads(meta_raw)
     meta_str = ''
     meta_str += f'Total repositories: {meta["repo_count"]}\n'
@@ -70,7 +81,7 @@ def generate_report(csv_path):
     line_count = count_lines('./repos', ['.java', '.js'])
     line_count['errorLines'] = len(inspections)
     performance_score = get_performance(line_count)
-    with open(DATA_JSON_PATH, 'w') as outfile:
+    with open(f'./outputs/{get_current_user()}/data.json', 'w') as outfile:
         json.dump(inspections, outfile, sort_keys=True, indent=4,
                   ensure_ascii=False)
     ruleset_count = 0

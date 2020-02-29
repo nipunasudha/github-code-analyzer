@@ -21,6 +21,10 @@ def on_delete_error(action, name, exc):
     os.remove(name)
 
 
+def create_folder_if_not_exist(filepath):
+    Path(filepath).mkdir(parents=True, exist_ok=True)
+
+
 def empty_dir(dir_path):
     for filename in os.listdir(dir_path):
         file_path = os.path.join(dir_path, filename)

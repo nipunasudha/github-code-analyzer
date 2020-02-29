@@ -1,4 +1,5 @@
-from analyzer.analyzer_utils import generate_analysis_csv, generate_report, generate_meta_json
+from analyzer.analyzer_utils import generate_analysis_csv, generate_report, generate_meta_json, save_current_user, \
+    get_current_user
 from utils import get_repo_list, empty_dir, clone_by_url
 
 
@@ -6,8 +7,6 @@ from utils import get_repo_list, empty_dir, clone_by_url
 # for analyzing code & generating reports
 ########################################
 class Analyzer(object):
-    def __init__(self):
-        self.INSPECTIONS_CSV_PATH = './outputs/inspection_output.csv'
 
     def clone(self, printer, indicator, prompter, username):
         if username.strip() is '':
@@ -15,6 +14,7 @@ class Analyzer(object):
             indicator(f'Cloning failed.', False)
             return 1
         else:
+            save_current_user(username)
             printer(f'Scanning user GitHub account \'{username}\'...')
             indicator(f'Scanning GitHub account...', True)
             generate_meta_json(username)
@@ -46,7 +46,7 @@ class Analyzer(object):
         printer('Performing static source code analysis...')
         indicator(f'Analyzing repositories...', True)
         try:
-            generate_analysis_csv(self.INSPECTIONS_CSV_PATH)
+            generate_analysis_csv(self.get_inspection_csv_path())
         except Exception as e:
             printer(f'Analysis failed!\n\nError Occured: {e}')
             indicator(f'Analysis failed.', False)
@@ -60,6 +60,9 @@ class Analyzer(object):
         indicator('Generating analysis report...', True)
         printer('Generating analysis report...')
         printer('============ REPORT START ============')
-        printer(generate_report(self.INSPECTIONS_CSV_PATH))
+        printer(generate_report(self.get_inspection_csv_path()))
         printer('============= REPORT END =============')
         indicator('Report generated!', False)
+
+    def get_inspection_csv_path(self):
+        return f'./outputs/{get_current_user()}/inspection_output.csv'
