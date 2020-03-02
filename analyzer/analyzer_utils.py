@@ -1,10 +1,9 @@
-import csv
 import json
 import os
 
 from analyzer.counter import count_lines
 from analyzer.repo_info import RepoInfoFetcher
-from utils import try_numeric, utils
+from utils import utils, generate_dictionary
 
 
 ########################################
@@ -12,15 +11,6 @@ from utils import try_numeric, utils
 ########################################
 def generate_analysis_csv(csv_path):
     os.system(f'pmd -d ./repos/ -R rulesets/java/quickstart.xml,ruleset.xml -f csv > {csv_path}')
-
-
-def generate_dictionary(csv_path):
-    try:
-        with open(csv_path) as f:
-            a = [{k: try_numeric(v) for k, v in row.items()} for row in csv.DictReader(f, skipinitialspace=True)]
-            return a
-    except:
-        return {}
 
 
 def generate_meta_json(username):

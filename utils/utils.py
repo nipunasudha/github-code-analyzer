@@ -85,3 +85,12 @@ def try_numeric(s):
     except ValueError:
         pass
     return s
+
+
+def generate_dictionary(csv_path):
+    try:
+        with open(csv_path) as f:
+            a = [{k: try_numeric(v) for k, v in row.items()} for row in csv.DictReader(f, skipinitialspace=True)]
+            return a
+    except:
+        return {}
