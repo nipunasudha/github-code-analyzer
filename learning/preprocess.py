@@ -23,6 +23,8 @@ def main():
         }
         # DATA PROCESSING
         categorized = load_data(dirpath)
+        if categorized is None:
+            continue
         for ruleset in categorized:
             ruleset_key = ruleset['Rule set']
             if ruleset_key not in aggregated['inspections']:
@@ -40,9 +42,12 @@ def main():
 
 
 def load_data(dirpath):
-    data_raw = open(path.join(dirpath, 'data.json')).read()
-    categorized = json.loads(data_raw)
-    return categorized
+    try:
+        data_raw = open(path.join(dirpath, 'data.json')).read()
+        categorized = json.loads(data_raw)
+        return categorized
+    except:
+        return None
 
 
 def load_meta(dirpath):
