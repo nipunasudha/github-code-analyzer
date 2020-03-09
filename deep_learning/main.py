@@ -9,7 +9,7 @@ from deep_learning.core import  train_model
 
 window = Tk()
 window.configure(background="#9980FA")
-window.title("GIithub User Level Detector")
+window.title("Github User Level Detector")
 window.geometry('500x300')
 
 lb5 = Label(window, text='', wraplength=300, background="#0652DD", fg='#40407a')
