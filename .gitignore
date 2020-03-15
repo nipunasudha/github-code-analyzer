@@ -132,3 +132,4 @@ dmypy.json
 repos/
 outputs/
 .idea/
+!outputs/dataset.csv
