@@ -5,6 +5,7 @@ from tkinter.scrolledtext import ScrolledText
 
 from analyzer.analyzer import Analyzer
 
+
 ########################################
 # All the code for the UI & interactions
 ########################################
@@ -122,8 +123,10 @@ class AnalyzeBar(Frame):
         process_thread.start()
 
     def on_report(self):
+        username = self.username_ctrl.get()
+        prediction = MainApp.analyzer.get_user_expertise(username)
         process_thread = threading.Thread(target=MainApp.analyzer.report,
-                                          args=(self.list_frame.append, self.list_frame.indicate))
+                                          args=(self.list_frame.append, self.list_frame.indicate, prediction))
         process_thread.start()
 
     def on_clear(self):

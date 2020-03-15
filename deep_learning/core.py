@@ -19,7 +19,7 @@ use_big_sample = True
 
 MODEL_SAVE_PATH = './deep_learning/models/saved_model.model'
 ENCODER_SAVE_PATH = './deep_learning/models/saved_encoder.npy'
-PREDICT_FILE_PATH = "./deep_learning/generated_csv/direct_all_features.csv"
+PREDICT_FILE_PATH = "./deep_learning/generated_csv/direct_raw_features.csv"
 encoder = LabelEncoder()
 model = Sequential()
 
@@ -74,6 +74,7 @@ def initialize():
 
 
 def get_prediction_for_user_id(user_id):
+    print(f'USER ID FOR PREDICITON IS {user_id}')
     dic_predict = {}
     with open(PREDICT_FILE_PATH, encoding="utf8") as f:
         users_array = [{k: v for k, v in row.items()}

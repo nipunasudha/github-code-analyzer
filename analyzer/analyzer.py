@@ -1,5 +1,8 @@
 from analyzer.analyzer_utils import generate_analysis_csv, generate_report, generate_meta_json, save_current_user, \
     get_current_user
+from deep_learning.core import get_prediction_for_user_id
+from deep_learning.extract_features import extract_features
+from deep_learning.preprocess import preprocess_user_data
 from utils import get_repo_list, empty_dir, clone_by_url
 
 
@@ -56,13 +59,21 @@ class Analyzer(object):
         indicator(f'Analysis successful!', False)
         return 0
 
-    def report(self, printer, indicator):
+    def report(self, printer, indicator, prediction):
         indicator('Generating analysis report...', True)
         printer('Generating analysis report...')
         printer('============ REPORT START ============')
         printer(generate_report(self.get_inspection_csv_path()))
+        printer('------------------------------------')
+        printer(f'PREDICTED USER EXPERTISE: {prediction}')
+        printer('------------------------------------')
         printer('============= REPORT END =============')
         indicator('Report generated!', False)
 
     def get_inspection_csv_path(self):
         return f'./outputs/{get_current_user()}/inspection_output.csv'
+
+    def get_user_expertise(self, user_id):
+        preprocess_user_data()
+        extract_features()
+        return get_prediction_for_user_id(user_id).upper()

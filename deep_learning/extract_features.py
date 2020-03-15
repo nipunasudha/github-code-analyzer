@@ -1,12 +1,14 @@
 import csv
-from tkinter import messagebox
 
 
 class DataList(object):
-    user_dict = {}
-    user_csv_path = './deep_learning/csv/dataset.csv'
 
-    def __init__(self):
+    def __init__(self, user_csv_path, no_labels):
+        self.user_dict = {}
+        self.key_list = self.user_dict.keys()
+        self.users_dict = []
+        self.user_csv_path = user_csv_path
+        self.no_labels = no_labels
         # users
         user_id_list = []
         self.id_and_label_list = []
@@ -19,14 +21,11 @@ class DataList(object):
 
             self.user_dict[user_id] = {'users': row}
 
-    key_list = user_dict.keys()
-    users_dict = []
-
     def get_user_data(self, i, count):
         user_features = {}
         user_data = self.user_dict[i]
-        label = ''
-        if count < 101:
+        label = 'raw'
+        if count <= 100 and not self.no_labels:
             evaluator1 = (user_data['users']['user1'])
             evaluator2 = (user_data['users']['user2'])
             evaluator3 = (user_data['users']['user3'])
@@ -58,7 +57,7 @@ class DataList(object):
         user_features['ins_security'] = user_data["users"]["ins_security"]
         return user_features
 
-    def get_feature_set_with_lable(self):
+    def get_feature_set_with_labels(self):
         s = 0
         for i in self.key_list:
             s = s + 1
@@ -102,18 +101,29 @@ def normalize_all(data_list):
     pass
 
 
-def extract_features():
-    data = DataList()
-    list_data = data.get_feature_set_with_lable()
+def extract_raw_features():
+    data = DataList('./outputs/dataset.csv', True)
+    list_data = data.get_feature_set_with_labels()
     normalize_all(list_data)
     keys = list(list_data[0].keys())
     # move ID & label to the end of the table
     keys.append(keys.pop(keys.index('Id')))
     keys.append(keys.pop(keys.index('label')))
-    with open('./deep_learning/generated_csv/direct_all_features.csv', 'w', newline='') as output_file:
+    with open('./deep_learning/generated_csv/direct_raw_features.csv', 'w', newline='') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         dict_writer.writerows(list_data)
+
+
+def extract_features():
+    extract_raw_features()
+    data = DataList('./deep_learning/csv/dataset.csv', False)
+    list_data = data.get_feature_set_with_labels()
+    normalize_all(list_data)
+    keys = list(list_data[0].keys())
+    # move ID & label to the end of the table
+    keys.append(keys.pop(keys.index('Id')))
+    keys.append(keys.pop(keys.index('label')))
     with open('./deep_learning/generated_csv/direct_features.csv', 'w', newline='') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
@@ -122,4 +132,4 @@ def extract_features():
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         dict_writer.writerows(list_data[35:])
-    messagebox.showinfo('Features Extracted!', 'Features Extracted. Now you can train the model using the features.')
+    print('Features Extracted!', 'Features Extracted. Now you can train the model using the features.')

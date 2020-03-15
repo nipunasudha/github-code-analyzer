@@ -91,12 +91,4 @@ def generate_report(csv_path):
     report += f'Total code lines: {line_count["codeLines"]}\n'
     report += f'Total lines with violations: {line_count["errorLines"]}\n'
     report += f'Performance Score: {"{0:.2%}".format(performance_score)}\n'
-    report += '=' * 20 + '\n'
-    report += f'Predicted User Expertise: {get_user_expertise(user_id)}'
-    report += '=' * 20 + '\n'
     return report
-
-
-def get_user_expertise(user_id):
-    preprocess_user_data()
-    get_prediction_for_user_id(user_id).upper()
