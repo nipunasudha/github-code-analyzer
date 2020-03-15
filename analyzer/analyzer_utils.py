@@ -3,6 +3,8 @@ import os
 
 from analyzer.counter import count_lines
 from analyzer.repo_info import RepoInfoFetcher
+from deep_learning.core import get_prediction_for_user_id
+from deep_learning.preprocess import preprocess_user_data
 from utils import utils, generate_dictionary
 
 
@@ -71,7 +73,8 @@ def generate_report(csv_path):
     line_count = count_lines('./repos', ['.java', '.js'])
     line_count['errorLines'] = len(inspections)
     performance_score = get_performance(line_count)
-    with open(f'./outputs/{get_current_user()}/data.json', 'w') as outfile:
+    user_id = get_current_user()
+    with open(f'./outputs/{user_id}/data.json', 'w') as outfile:
         json.dump(inspections, outfile, sort_keys=True, indent=4,
                   ensure_ascii=False)
     ruleset_count = 0
@@ -89,4 +92,11 @@ def generate_report(csv_path):
     report += f'Total lines with violations: {line_count["errorLines"]}\n'
     report += f'Performance Score: {"{0:.2%}".format(performance_score)}\n'
     report += '=' * 20 + '\n'
+    report += f'Predicted User Expertise: {get_user_expertise(user_id)}'
+    report += '=' * 20 + '\n'
     return report
+
+
+def get_user_expertise(user_id):
+    preprocess_user_data()
+    get_prediction_for_user_id(user_id).upper()

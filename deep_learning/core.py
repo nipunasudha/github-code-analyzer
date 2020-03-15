@@ -1,4 +1,5 @@
 # multi-class classification with Keras
+import csv
 from os import path
 from pathlib import Path
 
@@ -16,9 +17,9 @@ from sklearn.preprocessing import LabelEncoder
 # settings
 use_big_sample = True
 
-MODEL_SAVE_PATH = 'models/saved_model.model'
-ENCODER_SAVE_PATH = 'models/saved_encoder.npy'
-PREDICT_FILE_PATH = "generated_csv/direct_predict.csv"
+MODEL_SAVE_PATH = './deep_learning/models/saved_model.model'
+ENCODER_SAVE_PATH = './deep_learning/models/saved_encoder.npy'
+PREDICT_FILE_PATH = "./deep_learning/generated_csv/direct_all_features.csv"
 encoder = LabelEncoder()
 model = Sequential()
 
@@ -48,7 +49,7 @@ def baseline_model():
 
 def train_data():
     # load dataset
-    dataframe = pandas.read_csv("generated_csv/direct_features.csv" if use_big_sample else "csv/mini_sample.csv",
+    dataframe = pandas.read_csv("./deep_learning/generated_csv/direct_features.csv" if use_big_sample else "./deep_learning/csv/mini_sample.csv",
                                 header=None)
     dataset = dataframe.values
     X = dataset[1:, 0:11].astype(float)
@@ -69,7 +70,26 @@ def initialize():
     global encoder, model
     encoder = LabelEncoder()
     model = Sequential()
-    Path("models/").mkdir(parents=True, exist_ok=True)
+    Path("./deep_learning/models/").mkdir(parents=True, exist_ok=True)
+
+
+def get_prediction_for_user_id(user_id):
+    dic_predict = {}
+    with open(PREDICT_FILE_PATH, encoding="utf8") as f:
+        users_array = [{k: v for k, v in row.items()}
+                       for row in csv.DictReader(f, skipinitialspace=True)]
+        for row in users_array:
+            key = row['Id']
+            dic_predict[key] = row
+
+    if user_id in dic_predict.keys():
+        i = 0
+        for key in dic_predict.keys():
+            i = i + 1
+            if str(key) == user_id:
+                answer = get_prediction(i)
+                return answer
+    return None
 
 
 def get_prediction(i):
@@ -94,7 +114,5 @@ def get_prediction(i):
 def train_model():
     initialize()
     train_data()
-    current_model = model
-    current_encoder = encoder
     model.save(MODEL_SAVE_PATH, True)
     save_encoder()

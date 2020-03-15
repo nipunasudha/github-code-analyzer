@@ -4,7 +4,7 @@ from tkinter import messagebox
 
 class DataList(object):
     user_dict = {}
-    user_csv_path = 'csv/dataset_edit.csv'
+    user_csv_path = './deep_learning/csv/dataset.csv'
 
     def __init__(self):
         # users
@@ -106,17 +106,20 @@ def extract_features():
     data = DataList()
     list_data = data.get_feature_set_with_lable()
     normalize_all(list_data)
-    keys = list_data[0].keys()
-    with open('./generated_csv/direct_features.csv', 'w', newline='') as output_file:
+    keys = list(list_data[0].keys())
+    # move ID & label to the end of the table
+    keys.append(keys.pop(keys.index('Id')))
+    keys.append(keys.pop(keys.index('label')))
+    with open('./deep_learning/generated_csv/direct_all_features.csv', 'w', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(list_data)
+    with open('./deep_learning/generated_csv/direct_features.csv', 'w', newline='') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         dict_writer.writerows(list_data[:35])
-    with open('./generated_csv/direct_predict.csv', 'w', newline='') as output_file:
+    with open('./deep_learning/generated_csv/direct_predict.csv', 'w', newline='') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         dict_writer.writerows(list_data[35:])
     messagebox.showinfo('Features Extracted!', 'Features Extracted. Now you can train the model using the features.')
-
-
-if __name__ == '__main__':
-    extract_features()

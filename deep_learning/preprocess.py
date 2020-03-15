@@ -4,15 +4,15 @@ import os
 from os import path
 
 
-def get_all_output_dirs(path):
-    dirs = [os.path.join(path, o) for o in os.listdir(path)
-            if os.path.isdir(os.path.join(path, o))]
+def get_all_output_dirs(dir_path):
+    dirs = [os.path.join(dir_path, o) for o in os.listdir(dir_path)
+            if os.path.isdir(os.path.join(dir_path, o))]
     print(dirs)
     return dirs
 
 
-def main():
-    dir_list = get_all_output_dirs('../outputs/')
+def preprocess_user_data():
+    dir_list = get_all_output_dirs('./outputs/')
     aggregated_list = []
     for dirpath in dir_list:
         aggregated = {
@@ -71,10 +71,7 @@ def generate_dataset(aggregated_list):
 
     # writing to file
     keys = flattened[0].keys()
-    with open('../outputs/dataset.csv', 'w', newline='') as output_file:
+    with open('./outputs/dataset.csv', 'w', newline='') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         dict_writer.writerows(flattened)
-
-
-main()
