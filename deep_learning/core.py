@@ -59,7 +59,7 @@ def train_data():
     # convert integers to dummy variables (i.e. one hot encoded)
     dummy_y = np_utils.to_categorical(encoded_y)
 
-    estimator = KerasClassifier(build_fn=baseline_model, epochs=1, batch_size=1, verbose=0)
+    estimator = KerasClassifier(build_fn=baseline_model, epochs=100, batch_size=1, verbose=0)
     kfold = KFold(n_splits=10, shuffle=True)
     results = cross_val_score(estimator, X, dummy_y, cv=kfold)
     print(f"Baseline: {results.mean() * 100}% ({results.std() * 100}%)")

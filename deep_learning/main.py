@@ -4,52 +4,65 @@ from tkinter import messagebox
 
 from titlecase import titlecase
 
-from deep_learning.core import  get_prediction
-from deep_learning.core import  train_model
-
-window = Tk()
-window.configure(background="#9980FA")
-window.title("Github User Level Detector")
-window.geometry('500x300')
-
-lb5 = Label(window, text='', wraplength=300, background="#0652DD", fg='#40407a')
-lb5.pack(fill=BOTH, expand=1)
-lbl = Label(window, text="Predict Expertise", wraplength=300, background="#2c2c54")
-lbl.pack(fill=BOTH, expand=1)
+from deep_learning.core import get_prediction
+from deep_learning.core import train_model
+from deep_learning.extract_features import extract_features
 
 
 def train():
     train_model()
 
 
-with open('./generated_csv/direct_predict.csv', encoding="utf8") as f:
-    users_array = [{k: v for k, v in row.items()}
-                   for row in csv.DictReader(f, skipinitialspace=True)]
-dic_predict = {}
-for row in users_array:
-    key = row['Id']
-    dic_predict[key] = row
+def extract():
+    extract_features()
 
 
 def predict():
-    number = (entry.get())
-    i = 0
-    if str(number) in dic_predict.keys():
+    dic_predict = {}
+    with open('./generated_csv/direct_predict.csv', encoding="utf8") as f:
+        users_array = [{k: v for k, v in row.items()}
+                       for row in csv.DictReader(f, skipinitialspace=True)]
+        for row in users_array:
+            key = row['Id']
+            dic_predict[key] = row
+
+    user_id = username_entry.get()
+    if user_id in dic_predict.keys():
         i = 0
         for key in dic_predict.keys():
             i = i + 1
-            if str(key) == str(number):
+            if str(key) == user_id:
                 answer = get_prediction(i)
                 messagebox.showinfo('Predicted Answer', titlecase(answer))
 
 
-btn1 = Button(window, text="Train", command=train, background="#706fd3")
-btn1.pack(fill=BOTH, padx=40, pady=20)
-entry = Entry(window, bg='white')
-entry.pack(fill=BOTH, padx=150, pady=20)
-lb2 = Label(window, text="Enter User Name", wraplength=300, background="#474787")
-lb2.pack(fill=BOTH, padx=80, pady=0)
-btn = Button(window, text="Predict", command=predict, background="#ff793f")
-btn.pack(fill=BOTH, padx=40, pady=20)
+window = Tk()
+window.configure(bg="white")
+window.title("GitHub User Expertise Predictor")
 
+title_label = Label(window, text="GitHub User Expertise Predictor", wraplength=300, bg="#2c2c54", fg='white',
+                    font=('Arial', 15))
+title_label.pack(fill=X)
+
+learn_frame = Frame(window, bg='white')
+
+extract_button = Button(learn_frame, text="Extract User Features", command=extract, bg="#2c4c74", fg='white')
+extract_button.pack(fill=BOTH, padx=40, pady=7)
+train_button = Button(learn_frame,
+                      text="Train", command=train, bg="#2c4c74", fg='white')
+train_button.pack(fill=BOTH, padx=40, pady=7)
+learn_frame.pack(fill=BOTH, pady=20)
+# -----------------
+predict_frame = Frame(window, bg='white')
+input_frame = Frame(predict_frame, pady=10, bg='white')
+username_label = Label(input_frame, text="Enter username to predict expertise", wraplength=300, bg="white")
+username_label.grid(column=0, row=0)
+username_entry = Entry(input_frame, bg='white')
+username_entry.grid(column=1, row=0)
+input_frame.grid_columnconfigure(0, weight=1)
+input_frame.grid_columnconfigure(1, weight=1)
+input_frame.pack(fill=BOTH, padx=30)
+predict_button = Button(predict_frame, text="Predict", command=predict, bg="#d35400", fg='white')
+predict_button.pack(fill=BOTH, padx=40, pady=20)
+predict_frame.pack(fill=BOTH)
 window.mainloop()

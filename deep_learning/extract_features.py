@@ -1,12 +1,15 @@
 import csv
+from tkinter import messagebox
 
 
 class DataList(object):
     user_dict = {}
     user_csv_path = 'csv/dataset_edit.csv'
+
     def __init__(self):
         # users
         user_id_list = []
+        self.id_and_label_list = []
         with open(self.user_csv_path, encoding="utf8") as f:
             users_array = [{k: v for k, v in row.items()}
                            for row in csv.DictReader(f, skipinitialspace=True)]
@@ -15,25 +18,25 @@ class DataList(object):
             user_id_list.append(user_id)
 
             self.user_dict[user_id] = {'users': row}
+
     key_list = user_dict.keys()
     users_dict = []
 
     def get_user_data(self, i, count):
         user_features = {}
         user_data = self.user_dict[i]
+        label = ''
         if count < 101:
-
             evaluator1 = (user_data['users']['user1'])
             evaluator2 = (user_data['users']['user2'])
             evaluator3 = (user_data['users']['user3'])
 
             round_mean_levl = (float(evaluator1) + float(evaluator2) + float(evaluator3)) / 3
-            print(round_mean_levl)
-            if 1.8 >= round_mean_levl >= 1:
+            if 1.6 >= round_mean_levl >= 1:
                 label = 'beginner'
-            elif 2.9 >= round_mean_levl > 1.8:
+            elif 2.2 >= round_mean_levl > 1.6:
                 label = 'intermediate'
-            elif 3 >= round_mean_levl > 2.9:
+            elif 3 >= round_mean_levl > 2.2:
                 label = 'advance'
             elif 4 >= round_mean_levl > 3:
                 label = 'expert'
@@ -53,8 +56,6 @@ class DataList(object):
         user_features['ins_multithreading'] = user_data["users"]["ins_multithreading"]
         user_features['ins_performance'] = user_data["users"]["ins_performance"]
         user_features['ins_security'] = user_data["users"]["ins_security"]
-        print(user_data)
-        print(label)
         return user_features
 
     def get_feature_set_with_lable(self):
@@ -69,12 +70,6 @@ class DataList(object):
 
         return self.users_dict
 
-
-data = DataList()
-list_data = data.get_feature_set_with_lable()
-
-
-# print(list_data)
 
 def normalize_all(data_list):
     keys_to_normalize = ['languages', 'repo_count', 'total_commits', 'ins_best_practices', 'ins_code_style',
@@ -107,16 +102,21 @@ def normalize_all(data_list):
     pass
 
 
-normalize_all(list_data)
+def extract_features():
+    data = DataList()
+    list_data = data.get_feature_set_with_lable()
+    normalize_all(list_data)
+    keys = list_data[0].keys()
+    with open('./generated_csv/direct_features.csv', 'w', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(list_data[:35])
+    with open('./generated_csv/direct_predict.csv', 'w', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(list_data[35:])
+    messagebox.showinfo('Features Extracted!', 'Features Extracted. Now you can train the model using the features.')
 
-keys = list_data[0].keys()
 
-with open('./generated_csv/direct_features.csv', 'w', newline='') as output_file:
-    dict_writer = csv.DictWriter(output_file, keys)
-    dict_writer.writeheader()
-    dict_writer.writerows(list_data[:35])
-
-with open('./generated_csv/direct_predict.csv', 'w', newline='') as output_file:
-    dict_writer = csv.DictWriter(output_file, keys)
-    dict_writer.writeheader()
-    dict_writer.writerows(list_data[35:])
+if __name__ == '__main__':
+    extract_features()
