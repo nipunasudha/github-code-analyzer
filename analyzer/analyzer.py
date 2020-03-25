@@ -59,13 +59,13 @@ class Analyzer(object):
         indicator(f'Analysis successful!', False)
         return 0
 
-    def report(self, printer, indicator, prediction):
+    def report(self, printer, indicator, user_expertise_getter):
         indicator('Generating analysis report...', True)
         printer('Generating analysis report...')
         printer('============ REPORT START ============')
         printer(generate_report(self.get_inspection_csv_path()))
         printer('------------------------------------')
-        printer(f'PREDICTED USER EXPERTISE: {prediction}')
+        printer(f'PREDICTED USER EXPERTISE: {user_expertise_getter(get_current_user())}')
         printer('------------------------------------')
         printer('============= REPORT END =============')
         indicator('Report generated!', False)

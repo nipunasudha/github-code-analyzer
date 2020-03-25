@@ -1,8 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
 
-from titlecase import titlecase
-
 from deep_learning.core import get_prediction_for_user_id
 from deep_learning.core import train_model
 from deep_learning.extract_features import extract_features
@@ -18,7 +16,7 @@ def run_learning_application():
     def predict():
         user_id = username_entry.get()
         answer = get_prediction_for_user_id(user_id)
-        messagebox.showinfo('Predicted Answer', titlecase(answer))
+        messagebox.showinfo('Predicted Answer', answer)
 
     window = Tk()
     window.configure(bg="white")

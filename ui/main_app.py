@@ -123,11 +123,13 @@ class AnalyzeBar(Frame):
         process_thread.start()
 
     def on_report(self):
-        username = self.username_ctrl.get()
-        prediction = MainApp.analyzer.get_user_expertise(username)
-        process_thread = threading.Thread(target=MainApp.analyzer.report,
-                                          args=(self.list_frame.append, self.list_frame.indicate, prediction))
-        process_thread.start()
+        # Removed threading for report generation because threads caused prediction problems
+        # process_thread = threading.Thread(target=MainApp.analyzer.report,
+        #                                   args=(self.list_frame.append, self.list_frame.indicate,
+        #                                         MainApp.analyzer.get_user_expertise))
+        # process_thread.start()
+        MainApp.analyzer.report(self.list_frame.append, self.list_frame.indicate,
+                                MainApp.analyzer.get_user_expertise)
 
     def on_clear(self):
         self.list_frame.clear()
